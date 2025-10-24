@@ -1,0 +1,16 @@
+# Ignore data directories anywhere
+data/
+**/data/
+
+# ignore python virtual enviroments
+denv/
+**/denv/
+
+# Ignore Python cache
+__pycache__/
+**/__pycache__/
+
+# Ignore virtual environments
+venv/
+.env/
+.venv/
