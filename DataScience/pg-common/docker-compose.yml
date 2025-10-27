@@ -56,20 +56,50 @@ services:
       - "8080:8080"
 
   airflow:
+    image: docker.resaa.net/apache/airflow:3.1.1
     container_name: airflow
-    image: docker.resaa.net/apache/airflow:2.9.2
-    command: standalone
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
-      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'true'
+      AIRFLOW__WEBSERVER__ENABLE_PROXY_FIX: 'true'
+      _AIRFLOW_DB_MIGRATE: 'true'
+      _AIRFLOW_WWW_USER_CREATE: 'true'
+      _AIRFLOW_WWW_USER_USERNAME: airflow
+      _AIRFLOW_WWW_USER_PASSWORD: airflow
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
     ports:
       - "8081:8080"
+    command: >
+      bash -c "
+      airflow db upgrade &&
+      airflow users create --username airflow --firstname admin --lastname admin
+      --role Admin --email admin@example.com --password airflow &&
+      airflow webserver &
+      airflow scheduler
+      "
+    # restart: always
+    user: "${AIRFLOW_UID:-50000}:0"
 
   postgres:
     image: docker.resaa.net/postgres:16.10-alpine3.22
     container_name: db
     environment:
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
     ports:
       - "5432:5432"
     volumes:
       - ./data/pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+      start_period: 5s

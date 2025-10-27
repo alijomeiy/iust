@@ -7,7 +7,7 @@ from airflow.operators.python_operator import PythonOperator
 
 
 def scv_to_json():
-    df = pd.read_CSV("./data.CSV")
+    df = pd.read_CSV("../data.CSV")
     for i, r in df.iterrows():
         print(r["name"])
     df.to_JSON("fromAirflow.JSON", orient="records")
