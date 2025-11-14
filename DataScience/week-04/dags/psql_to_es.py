@@ -50,16 +50,14 @@ class PostgresqlConnectionPg:
         return pd.read_sql("select * from users where id=400", self._connection)
 
 
-ps = PostgresqlConnectionPg(
-    dbname="dataengineering",
-    host="192.168.21.81",
-    user="admin",
-    password="adminpass",
-    base_query="insert into users (id,name,street,city,zip) values(%s,%s,%s,%s,%s)",
-)
-
-
 def queryPostgresql():
+    ps = PostgresqlConnectionPg(
+        dbname="dataengineering",
+        host="192.168.21.81",
+        user="admin",
+        password="adminpass",
+        base_query="insert into users (id,name,street,city,zip) values(%s,%s,%s,%s,%s)",
+    )
     ps.write_db_to_csv("postgresqldata.csv")
     print("-------Data Saved------")
 
@@ -77,8 +75,8 @@ with DAG(
     "psql-to-es",
     default_args={
         "depends_on_past": False,
-        "retries": 1,
-        "retry_delay": timedelta(hours=2),
+        "retries": 5,
+        "retry_delay": timedelta(minutes=5),
         # 'queue': 'bash_queue',
         # 'pool': 'backfill',
         # 'priority_weight': 10,
