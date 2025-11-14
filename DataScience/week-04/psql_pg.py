@@ -1,8 +1,9 @@
 import psycopg2 as db
 from faker import Faker
+import pandas as pd
 
 
-class ConnectionPG:
+class PostgresqlConnectionPg:
     def __init__(self, dbname, host, user, password, base_query):
         self._connection_string = (
             f"dbname='{dbname}' host='{host}' user='{user}' password='{password}'"
@@ -52,9 +53,12 @@ class ConnectionPG:
         csv_file.close()
         pass
 
+    def load_db_in_pandas(self):
+        return pd.read_sql("select * from users where id=400", self._connection)
+
 
 if __name__ == "__main__":
-    pg = ConnectionPG(
+    pg = PostgresqlConnectionPg(
         dbname="dataengineering",
         host="192.168.21.81",
         user="admin",
@@ -62,4 +66,5 @@ if __name__ == "__main__":
         base_query="insert into users (id,name,street,city,zip) values(%s,%s,%s,%s,%s)",
     )
 
-    pg.write_db_to_csf()
+    frame = pg.load_db_in_pandas()
+    print(frame.to_json(orient="records"))
