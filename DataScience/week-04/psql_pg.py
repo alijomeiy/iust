@@ -45,10 +45,10 @@ class PostgresqlConnectionPg:
             print(record)
         pass
 
-    def write_db_to_csf(self):
+    def write_db_to_csv(self, csv_file_name:str):
         query = "select * from users;"
         self._cursor.execute(query)
-        csv_file = open("fromdb.csv", "w")
+        csv_file = open(csv_file_name, "w")
         self._cursor.copy_to(csv_file, "users", sep=",")
         csv_file.close()
         pass
