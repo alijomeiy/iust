@@ -257,32 +257,32 @@ if __name__ == "__main__":
     ]
 
     select_engine = MapReduceDummyEngine(map_select_age_gt_30, reduce_select_age_gt_30)
-    print("\n=== SELECTION σ_age>30 ===")
+    print("\n=== SELECTION age>30 ===")
     print(select_engine.run(records, parallel=True))
 
     project_engine = MapReduceDummyEngine(
         map_project_name_city, reduce_project_name_city
     )
-    print("\n=== PROJECTION π_name,city ===")
+    print("\n=== PROJECTION name,city ===")
     print(project_engine.run(records, parallel=True))
 
     rename_engine = MapReduceDummyEngine(
         map_rename_name_to_fullname, reduce_rename_passthrough
     )
-    print("\n=== RENAME ρ_full_name←name ===")
+    print("\n=== RENAME full_name <- name ===")
     print(rename_engine.run(records, parallel=True))
 
     R = records[:5]
     S = records[3:]
     union_engine = MapReduceDummyEngine(map_union, reduce_union)
-    print("\n=== UNION R ∪ S ===")
+    print("\n=== UNION R and S ===")
     print(union_engine.run(R + S, parallel=True))
 
     # ===== INTERSECTION: R ∩ S
     R_tag = tag_with_source(R, "R")
     S_tag = tag_with_source(S, "S")
     inter_engine = MapReduceDummyEngine(map_intersection, reduce_intersection)
-    print("\n=== INTERSECTION R ∩ S ===")
+    print("\n=== INTERSECTION R and S ===")
     print(inter_engine.run(R_tag + S_tag, parallel=True))
 
     # ===== DIFFERENCE: R − S
@@ -333,7 +333,7 @@ if __name__ == "__main__":
         {"CID": 20},
     ]
     div_engine = MapReduceDummyEngine(map_division, reduce_division)
-    print("\n=== DIVISION Enroll ÷ MustTake ===")
+    print("\n=== DIVISION Enroll MustTake ===")
     print(
         div_engine.run(
             tag_with_source(enroll, "R") + tag_with_source(must_take, "S"),
