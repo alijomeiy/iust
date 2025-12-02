@@ -1,0 +1,21 @@
+menu "Demo application configuration"
+
+config FEATURE_HELLO
+    bool "Enable 'hello' feature"
+    default y
+    help
+      If enabled, the program will print a friendly hello message.
+
+config FEATURE_MATH
+    bool "Enable 'math' feature"
+    default y
+    help
+      If enabled, the program will compile a simple addition function.
+
+config USER_NAME
+    string "User name to greet"
+    default "World"
+    help
+      This string will be used by the hello feature to greet the user.
+
+endmenu
