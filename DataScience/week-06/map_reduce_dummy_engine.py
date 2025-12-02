@@ -58,7 +58,6 @@ class MapReduceDummyEngine:
         for key in sorted(intermediates.keys()):
             values = intermediates[key]
             for out_record in self.reducer(key, values):
-                # توجه: reducer باید رکورد نهایی رو yield کنه
                 results.append(out_record)
 
         return results
@@ -102,7 +101,6 @@ def map_rename_name_to_fullname(record):
     new_rec = dict(record)
     if "name" in new_rec:
         new_rec["full_name"] = new_rec.pop("name")
-    # یک key ثابت
     return [("all", new_rec)]
 
 
@@ -176,13 +174,11 @@ def reduce_cartesian(key, values):
         else:
             S_records.append(pure)
 
-    # ضرب دکارتی
     for r in R_records:
         for s in S_records:
             merged = dict(r)
             for k, v in s.items():
                 if k in merged:
-                    # اگر اسم ستون مشترک بود، طرف S را prefix می‌کنیم
                     merged[f"S_{k}"] = v
                 else:
                     merged[k] = v
@@ -250,7 +246,6 @@ def reduce_division(key, values):
 
 
 if __name__ == "__main__":
-    # یک رابطه‌ی ساده برای مثال selection / projection / rename / union
     records = [
         {"id": 1, "name": "Ali", "city": "Tehran", "age": 25},
         {"id": 2, "name": "Sara", "city": "Tehran", "age": 31},
