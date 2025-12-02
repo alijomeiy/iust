@@ -76,25 +76,45 @@ def reduce_count_by_city(key, values):
     yield (key, total)
 
 
-def map_select_upperthan_30(record):
-    age = record["age"]
-    if age > 30:
-        return [(record["id"], record)]
+def map_select_age_gt_30(record):
+    if record["age"] > 30:
+        return [("keep", record)]
+    return []
 
 
-def reduce_select_upper_than_30(key, values):
-    yield (key, values)
+def reduce_select_age_gt_30(key, values):
+    for r in values:
+        yield r
 
 
 def map_project_name_city(record):
-    return [(record["name"], record["city"])]
+    key = (record["name"], record["city"])
+    return [(key, None)]
 
 
 def reduce_project_name_city(key, values):
-    yield (key, values)
+    yield key
 
 
-def map_union_
+def map_union(record):
+    key = tuple(sorted(record.items()))
+    return [(key, record)]
+
+
+def reduce_union(key, values):
+    yield values[0]
+
+
+def reduce_union(key, values):
+    seen = set()
+    unique_list = []
+    for d in values:
+        t = tuple(sorted(d.items()))
+        if t not in seen:
+            seen.add(t)
+            unique_list.append(d)
+    yield [(key, unique_list)]
+
 
 if __name__ == "__main__":
     records = [
@@ -108,6 +128,9 @@ if __name__ == "__main__":
         {"id": 8, "name": "Fatemeh", "city": "Mashhad", "age": 19},
         {"id": 9, "name": "Mohsen", "city": "Shiraz", "age": 33},
         {"id": 10, "name": "Sina", "city": "Tehran", "age": 21},
+        {"id": 11, "name": "Pari", "city": "Isfahan", "age": 28},
+        {"id": 11, "name": "Pari", "city": "Isfahan", "age": 28},
+        {"id": 11, "name": "Pari", "city": "Isfahan", "age": 28},
         {"id": 11, "name": "Pari", "city": "Isfahan", "age": 28},
         {"id": 12, "name": "Ladan", "city": "Tehran", "age": 24},
         {"id": 13, "name": "Kian", "city": "Tabriz", "age": 30},
@@ -124,12 +147,13 @@ if __name__ == "__main__":
     project_engine = MapReduceDummyEngine(
         map_project_name_city, reduce_project_name_city
     )
-    select_engine = MapReduceDummyEngine(
-        map_select_upperthan_30, reduce_select_upper_than_30
-    )
+    select_engine = MapReduceDummyEngine(map_select_age_gt_30, reduce_select_age_gt_30)
+    union_engine = MapReduceDummyEngine(map_union, reduce_union)
 
     result = counter_engine.run(records, parallel=True)
     print(f"\n\nCOUNT: {result}")
+    result = union_engine.run(records, parallel=True)
+    print(f"\n\nUNION: {result}")
     result = project_engine.run(records, parallel=True)
     print(f"\n\nPROJECT: {result}")
     result = select_engine.run(records, parallel=True)
