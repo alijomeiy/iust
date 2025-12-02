@@ -68,14 +68,11 @@ class MapReduceDummyEngine:
 
 def map_count_by_city(record):
     city = record["city"]
-    # هر رکورد در این شهر → یک واحد به حسابش
     return [(city, 1)]
 
 
 def reduce_count_by_city(key, values):
-    # print(f"K: {key} ---> Vs:{values}")
     total = sum(values)
-    # key همون city هست
     yield (key, total)
 
 
@@ -97,7 +94,7 @@ def reduce_project_name_city(key, values):
     yield (key, values)
 
 
-# def map_uni
+def map_union_
 
 if __name__ == "__main__":
     records = [
