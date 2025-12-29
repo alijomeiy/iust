@@ -1,0 +1,12 @@
+services:
+  postgres:
+    container_name: db
+    image: docker.resaa.net/postgres:16
+    environment:
+      POSTGRES_USER: api
+      POSTGRES_PASSWORD: api
+      POSTGRES_DB: api
+    volumes:
+      - ./.data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"

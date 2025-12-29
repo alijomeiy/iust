@@ -7,5 +7,5 @@
 # Demo application configuration
 #
 CONFIG_FEATURE_HELLO=y
-CONFIG_FEATURE_MATH=y
+# CONFIG_FEATURE_MATH is not set
 CONFIG_USER_NAME="World-test"
