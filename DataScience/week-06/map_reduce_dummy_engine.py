@@ -70,7 +70,7 @@ def tag_with_source(records, src_name):
 # ---------------------------------- Select -----------------------------------
 
 
-def map_select_age_gt_30(record):
+def map_select(record):
     if record["age"] > 30:
         return [("keep", record)]
     return []
@@ -189,33 +189,12 @@ def reduce_cartesian(key, values):
 
 
 def map_join_on_id(record):
-    src = record["__src"]
-    pure = {k: v for k, v in record.items() if k != "__src"}
-    key = pure["id"]  # join key
-    return [(key, (src, pure))]
+    return [(record["id"], (record, record["owner"]))]
 
 
 def reduce_join_on_id(key, values):
-    R_side = []
-    S_side = []
-
-    for src, rec in values:
-        if src == "R":
-            R_side.append(rec)
-        else:
-            S_side.append(rec)
-
-    for r in R_side:
-        for s in S_side:
-            merged = dict(r)
-            for k, v in s.items():
-                if k == "id":
-                    continue
-                if k in merged:
-                    merged[f"S_{k}"] = v
-                else:
-                    merged[k] = v
-            yield merged
+    # if avali dasht va domovi ham dasht
+    yield [()]
 
 
 # ----------------------------------- Join ------------------------------------
@@ -256,7 +235,7 @@ if __name__ == "__main__":
         {"id": 7, "name": "Hossein", "city": "Tabriz", "age": 40},
     ]
 
-    select_engine = MapReduceDummyEngine(map_select_age_gt_30, reduce_select_age_gt_30)
+    select_engine = MapReduceDummyEngine(map_select, reduce_select_age_gt_30)
     print("\n=== SELECTION age>30 ===")
     print(select_engine.run(records, parallel=True))
 

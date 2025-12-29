@@ -1,0 +1,40 @@
+version: "3"
+services:
+  namenode:
+    image: docker.resaa.net/apache/hadoop:3
+    container_name: nnode
+    hostname: namenode
+    command: ["hdfs", "namenode"]
+    ports:
+      - 9870:9870
+    env_file:
+      - ./config
+    environment:
+      ENSURE_NAMENODE_DIR: "/tmp/hadoop-root/dfs/name"
+    volumes:
+      - ./nnode/:/tmp/input/
+  datanode:
+    image: docker.resaa.net/apache/hadoop:3
+    container_name: dnode
+    command: ["hdfs", "datanode"]
+    env_file:
+      - ./config
+    volumes:
+      - ./nnode/:/tmp/input/
+  resourcemanager:
+    image: docker.resaa.net/apache/hadoop:3
+    container_name: rm
+    hostname: resourcemanager
+    command: ["yarn", "resourcemanager"]
+    ports:
+      - 8088:8088
+    env_file:
+      - ./config
+    volumes:
+      - ./test.sh:/opt/test.sh
+  nodemanager:
+    image: docker.resaa.net/apache/hadoop:3
+    container_name: nm
+    command: ["yarn", "nodemanager"]
+    env_file:
+      - ./config
