@@ -10,6 +10,7 @@ services:
       - ./.data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+
   rabbitmq:
     image: docker.resaa.net/rabbitmq:latest
     container_name: rabbitmq
@@ -26,21 +27,6 @@ services:
     volumes:
       - rabbitmq-lib:/var/lib/rabbitmq/
       - rabbitmq-log:/var/log/rabbitmq
-  rabbitscout:
-    image: docker.resaa.net/ghcr.io/ralve-org/rabbitscout:latest
-    container_name: rabbitscout
-    restart: always
-    ports:
-      - "0.0.0.0:3000:3000"
-    environment:
-      NEXT_PUBLIC_RABBITMQ_HOST: rabbitmq     # نام سرویس rabbitmq در شبکه داخلی
-      NEXT_PUBLIC_RABBITMQ_PORT: 15672
-      NEXT_PUBLIC_RABBITMQ_VHOST: /
-      RABBITMQ_USERNAME: rabbitmquser
-      RABBITMQ_PASSWORD: rabbitmqpass
-      NEXT_PUBLIC_API_URL: http://0.0.0.0:3000   # یا IP ماشین مجازی‌ت
-    depends_on:
-      - rabbitmq
 
   es:
     image: docker.resaa.net/elasticsearch:9.1.5
@@ -77,6 +63,16 @@ services:
     depends_on:
       - es
 
+  logstash:
+    image: docker.resaa.net/logstash:9.1.5
+    container_name: logstash
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    depends_on:
+      - rabbitmq
+      - es
+    restart: always
+
 volumes:
   postgres-db-volume:
   esdata:
@@ -88,12 +84,10 @@ volumes:
   rabbitmq-log:
     driver: local
 
-
 networks:
   default:
     name: elastic
     external: false
-
 
 configs:
   rabbitmq-plugins:
