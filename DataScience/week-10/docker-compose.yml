@@ -10,3 +10,91 @@ services:
       - ./.data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+  rabbitmq:
+    image: docker.resaa.net/rabbitmq:latest
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbitmquser
+      RABBITMQ_DEFAULT_PASS: rabbitmqpass
+    configs:
+      - source: rabbitmq-plugins
+        target: /etc/rabbitmq/enabled_plugins
+    volumes:
+      - rabbitmq-lib:/var/lib/rabbitmq/
+      - rabbitmq-log:/var/log/rabbitmq
+  rabbitscout:
+    image: docker.resaa.net/ghcr.io/ralve-org/rabbitscout:latest
+    container_name: rabbitscout
+    restart: always
+    ports:
+      - "0.0.0.0:3000:3000"
+    environment:
+      NEXT_PUBLIC_RABBITMQ_HOST: rabbitmq     # نام سرویس rabbitmq در شبکه داخلی
+      NEXT_PUBLIC_RABBITMQ_PORT: 15672
+      NEXT_PUBLIC_RABBITMQ_VHOST: /
+      RABBITMQ_USERNAME: rabbitmquser
+      RABBITMQ_PASSWORD: rabbitmqpass
+      NEXT_PUBLIC_API_URL: http://0.0.0.0:3000   # یا IP ماشین مجازی‌ت
+    depends_on:
+      - rabbitmq
+
+  es:
+    image: docker.resaa.net/elasticsearch:9.1.5
+    container_name: es
+    labels:
+      co.elastic.logs/module: elasticsearch
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    environment:
+      - node.name=es
+      - discovery.type=single-node
+      - ELASTIC_PASSWORD=123qwe1!@#QWE
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+    mem_limit: 6g
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
+  kibana:
+    image: docker.resaa.net/kibana:9.1.5
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://192.168.21.81:9200
+    ports:
+      - "5601:5601"
+    volumes:
+      - kibanadata:/usr/share/kibana/data
+    depends_on:
+      - es
+
+volumes:
+  postgres-db-volume:
+  esdata:
+    driver: local
+  kibanadata:
+    driver: local
+  rabbitmq-lib:
+    driver: local
+  rabbitmq-log:
+    driver: local
+
+
+networks:
+  default:
+    name: elastic
+    external: false
+
+
+configs:
+  rabbitmq-plugins:
+    content: "[rabbitmq_management]."
