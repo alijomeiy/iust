@@ -73,6 +73,25 @@ services:
       - es
     restart: always
 
+  spark:
+    image: bitnami/spark:3.5
+    container_name: spark
+    environment:
+      - SPARK_MODE=master
+      - SPARK_MASTER_HOST=spark
+      - SPARK_MASTER_PORT=7077
+      - SPARK_MASTER_WEBUI_PORT=8080
+      - ES_HOST=es
+      - PG_HOST=db
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    volumes:
+      - ./spark_job:/opt/spark/job
+    depends_on:
+      - es
+      - postgres
+
 volumes:
   postgres-db-volume:
   esdata:

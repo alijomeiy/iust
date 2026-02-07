@@ -2,29 +2,32 @@ from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 
-# مدل برای metadata
 class Metadata(BaseModel):
     key: str
     value: str
 
-# مدل برای درخواست شروع جلسه
 class SessionStartRequest(BaseModel):
     device_time: datetime
-    session_metadata: Optional[List[Metadata]] = []  # تغییر نام از metadata به session_metadata
+    device_id: Optional[str] = None  # machine id (can also be extracted from metadata)
+    session_metadata: Optional[List[Metadata]] = []
 
-# مدل برای رکوردهای Telemetry
 class TelemetryRecordRequest(BaseModel):
     seq: int
     type: str
     device_time: datetime
     data: Dict[str, Any]
 
-# مدل برای درخواست ثبت رکوردهای Telemetry به صورت دسته‌ای
 class TelemetryBatchRequest(BaseModel):
     session_id: str
+    device_id: Optional[str] = None  # required for distance calculation
     records: List[TelemetryRecordRequest]
 
-# مدل برای درخواست Heartbeat دستگاه
+class DeviceEventConfigCreate(BaseModel):
+    device_id: str
+    event_name: str
+    km_threshold: float
+
+
 class DeviceHeartbeatRequest(BaseModel):
     device_time: datetime
     battery_pct: int
