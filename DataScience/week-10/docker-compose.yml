@@ -1,7 +1,7 @@
 services:
   postgres:
     container_name: db
-    image: docker.resaa.net/postgres:16
+    image: postgres:16
     environment:
       POSTGRES_USER: api
       POSTGRES_PASSWORD: api
@@ -12,12 +12,12 @@ services:
       - "5432:5432"
 
   rabbitmq:
-    image: docker.resaa.net/rabbitmq:latest
+    image: rabbitmq:3-management
     container_name: rabbitmq
     restart: always
     ports:
-      - 5672:5672
-      - 15672:15672
+      - "5672:5672"
+      - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: rabbitmquser
       RABBITMQ_DEFAULT_PASS: rabbitmqpass
@@ -29,18 +29,17 @@ services:
       - rabbitmq-log:/var/log/rabbitmq
 
   es:
-    image: docker.resaa.net/elasticsearch:9.1.5
+    image: elasticsearch:8.11.3
     container_name: es
     labels:
       co.elastic.logs/module: elasticsearch
     volumes:
       - esdata:/usr/share/elasticsearch/data
     ports:
-      - 9200:9200
+      - "9200:9200"
     environment:
       - node.name=es
       - discovery.type=single-node
-      - ELASTIC_PASSWORD=123qwe1!@#QWE
       - bootstrap.memory_lock=true
       - xpack.security.enabled=false
       - xpack.security.http.ssl.enabled=false
@@ -52,10 +51,10 @@ services:
         hard: -1
 
   kibana:
-    image: docker.resaa.net/kibana:9.1.5
+    image: kibana:8.11.3
     container_name: kibana
     environment:
-      - ELASTICSEARCH_HOSTS=http://192.168.21.81:9200
+      - ELASTICSEARCH_HOSTS=http://es:9200
     ports:
       - "5601:5601"
     volumes:
@@ -64,7 +63,7 @@ services:
       - es
 
   logstash:
-    image: docker.resaa.net/logstash:9.1.5
+    image: logstash:8.11.3
     container_name: logstash
     volumes:
       - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
@@ -74,15 +73,9 @@ services:
     restart: always
 
   spark:
-    image: bitnami/spark:3.5
+    image: apache/spark:3.5.0
     container_name: spark
-    environment:
-      - SPARK_MODE=master
-      - SPARK_MASTER_HOST=spark
-      - SPARK_MASTER_PORT=7077
-      - SPARK_MASTER_WEBUI_PORT=8080
-      - ES_HOST=es
-      - PG_HOST=db
+    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.master.Master", "--host", "0.0.0.0", "--port", "7077", "--webui-port", "8080"]
     ports:
       - "8080:8080"
       - "7077:7077"
@@ -92,8 +85,8 @@ services:
       - es
       - postgres
 
+
 volumes:
-  postgres-db-volume:
   esdata:
     driver: local
   kibanadata:
