@@ -1,0 +1,2 @@
+# Run distance/events Spark job every hour (inside Docker)
+0 * * * * /root/apg/iust/DataScience/week-10/spark_job/run_job_in_docker.sh
