@@ -1,0 +1,118 @@
+services:
+  postgres:
+    container_name: db
+    image: postgres:16
+    environment:
+      POSTGRES_USER: api
+      POSTGRES_PASSWORD: api
+      POSTGRES_DB: api
+    volumes:
+      - ./.data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbitmquser
+      RABBITMQ_DEFAULT_PASS: rabbitmqpass
+    configs:
+      - source: rabbitmq-plugins
+        target: /etc/rabbitmq/enabled_plugins
+    volumes:
+      - rabbitmq-lib:/var/lib/rabbitmq/
+      - rabbitmq-log:/var/log/rabbitmq
+
+  es:
+    image: elasticsearch:8.11.3
+    container_name: es
+    labels:
+      co.elastic.logs/module: elasticsearch
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    environment:
+      - node.name=es
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+    mem_limit: 6g
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
+  kibana:
+    image: kibana:8.11.3
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://es:9200
+    ports:
+      - "5601:5601"
+    volumes:
+      - kibanadata:/usr/share/kibana/data
+    depends_on:
+      - es
+
+  logstash:
+    image: logstash:8.11.3
+    container_name: logstash
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    depends_on:
+      - rabbitmq
+      - es
+    restart: always
+
+  spark:
+    image: apache/spark:3.5.0
+    container_name: spark
+    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.master.Master", "--host", "0.0.0.0", "--port", "7077", "--webui-port", "8080"]
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    volumes:
+      - ./spark_job:/opt/spark/job
+    depends_on:
+      - es
+      - postgres
+  api:
+    build:
+      context: .
+      dockerfile: rest_api_gateway/Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      - DATABASE_URL=postgresql://api:api@postgres:5432/api
+      - RABBIT_URL=amqp://rabbitmquser:rabbitmqpass@rabbitmq:5672/
+
+
+volumes:
+  esdata:
+    driver: local
+  kibanadata:
+    driver: local
+  rabbitmq-lib:
+    driver: local
+  rabbitmq-log:
+    driver: local
+
+networks:
+  default:
+    name: elastic
+    external: false
+
+configs:
+  rabbitmq-plugins:
+    content: "[rabbitmq_management]."
