@@ -5,18 +5,23 @@
 
 ---
 ## `/v1/sessions/start` (POST)
-### request    
+### request
 - `device_time: time`
-- `metadata: object`  
+- `device_id: string` (optional)
+- `metadata` or `session_metadata: array<{key, value}>` (optional)
+
 ### response
 - `session_id: string`
 
 ---
 
 ## `/v1/sessions/end` (POST)
-### request
+### request (query)
 - `session_id: string`
 - `device_time: time`
+
+### body (optional)
+- `device_id: string`
 
 ---
 
@@ -24,46 +29,36 @@
 
 ### request
 - `session_id: string`
-- `device_id: string` (optional - required for distance calculation)
+- `device_id: string` (optional – برای محاسبه کیلومتر لازم است)
 - `records: array<Record>`
-    - `seq: int64`
-    - `type: string (gps|obd|temp|event|audio_meta|...)`
-    - `device_time: time`
-    - `data: object`
+  - `seq: int64`
+  - `type: string` (gps|obd|...)
+  - `device_time: time`
+  - `data: object`
 
 ---
 
 ## `/v1/device/heartbeat` (POST)
 
 ### request
+- `device_id: string` (optional)
 - `device_time: time`
 - `battery_pct: int32`
 - `network: object`
 - `storage_free_mb: int32`
-- `camera: object`  
+- `camera: object`
 
 ---
 
-## `/v1/device/{device_id}/messages` (GET)
+## `/v1/device/{device_id}/oil-change-due` (GET)
 
-Devices poll this endpoint to fetch messages (e.g. when km event threshold is reached).
-
-### query
-- `unread_only: bool` (default: true)
+بر اساس کیلومتر تجمعی خودرو (از جاب اسپارک) برمی‌گرداند آیا باید روغن عوض شود (۲۰۰۰ کیلومتر).
 
 ### response
-- `messages: array<{id, event_name, message, km_at_trigger, created_at}>`
-
----
-
-## `/v1/device/{device_id}/messages/{message_id}/ack` (POST)
-
-Mark message as read by device.
+- `oil_change_due: boolean`
 
 ---
 
 ## Media Stuff (POST)
 
-
- todo!
----
+todo!

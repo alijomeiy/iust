@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 
@@ -8,8 +8,10 @@ class Metadata(BaseModel):
 
 class SessionStartRequest(BaseModel):
     device_time: datetime
-    device_id: Optional[str] = None  # machine id (can also be extracted from metadata)
-    session_metadata: Optional[List[Metadata]] = []
+    device_id: Optional[str] = None
+    session_metadata: Optional[List[Metadata]] = Field(default=None, alias="metadata")
+
+    model_config = {"populate_by_name": True}
 
 class TelemetryRecordRequest(BaseModel):
     seq: int
@@ -19,16 +21,11 @@ class TelemetryRecordRequest(BaseModel):
 
 class TelemetryBatchRequest(BaseModel):
     session_id: str
-    device_id: Optional[str] = None  # required for distance calculation
+    device_id: Optional[str] = None
     records: List[TelemetryRecordRequest]
 
-class DeviceEventConfigCreate(BaseModel):
-    device_id: str
-    event_name: str
-    km_threshold: float
-
-
 class DeviceHeartbeatRequest(BaseModel):
+    device_id: Optional[str] = None
     device_time: datetime
     battery_pct: int
     network: Dict[str, Any]

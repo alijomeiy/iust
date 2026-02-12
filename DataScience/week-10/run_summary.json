@@ -1,0 +1,128 @@
+{
+  "generated_at": "2026-02-12T00:26:39Z",
+  "api_base": "http://localhost:8000",
+  "cars": 10,
+  "days": 3,
+  "cars_summary": [
+    {
+      "car_id": "car-001",
+      "session_id": "d3b8c999-d3c3-4d0b-b479-e0b291c5c703",
+      "dominant_city": "Mashhad",
+      "days_requested": 3,
+      "active_days": 3,
+      "total_km_approx": 77,
+      "trips_total": 16,
+      "batches_sent": 3,
+      "heartbeats_sent": 1,
+      "has_travel_city": false
+    },
+    {
+      "car_id": "car-002",
+      "session_id": "82e86943-53ad-4b7f-9f61-30b059a4694b",
+      "dominant_city": "Mashhad",
+      "days_requested": 3,
+      "active_days": 3,
+      "total_km_approx": 49,
+      "trips_total": 13,
+      "batches_sent": 3,
+      "heartbeats_sent": 2,
+      "has_travel_city": true
+    },
+    {
+      "car_id": "car-003",
+      "session_id": "63430065-71ca-46a8-8c9b-dac61366ca25",
+      "dominant_city": "Mashhad",
+      "days_requested": 3,
+      "active_days": 3,
+      "total_km_approx": 56,
+      "trips_total": 6,
+      "batches_sent": 3,
+      "heartbeats_sent": 3,
+      "has_travel_city": false
+    },
+    {
+      "car_id": "car-004",
+      "session_id": "ee916221-bbd3-4ea8-90ce-c56efe5c8cfa",
+      "dominant_city": "Ahvaz",
+      "days_requested": 3,
+      "active_days": 3,
+      "total_km_approx": 65,
+      "trips_total": 10,
+      "batches_sent": 3,
+      "heartbeats_sent": 1,
+      "has_travel_city": true
+    },
+    {
+      "car_id": "car-005",
+      "session_id": "254622d8-2948-49c9-b70f-f9333604d8be",
+      "dominant_city": "Shiraz",
+      "days_requested": 3,
+      "active_days": 2,
+      "total_km_approx": 45,
+      "trips_total": 8,
+      "batches_sent": 2,
+      "heartbeats_sent": 2,
+      "has_travel_city": false
+    },
+    {
+      "car_id": "car-006",
+      "session_id": "b3aff719-61a3-4687-8cc5-2a70ea503016",
+      "dominant_city": "Qom",
+      "days_requested": 3,
+      "active_days": 2,
+      "total_km_approx": 56,
+      "trips_total": 9,
+      "batches_sent": 2,
+      "heartbeats_sent": 1,
+      "has_travel_city": false
+    },
+    {
+      "car_id": "car-007",
+      "session_id": "43b5be67-a982-4d20-8744-64d5e2dd57a8",
+      "dominant_city": "Kerman",
+      "days_requested": 3,
+      "active_days": 3,
+      "total_km_approx": 62,
+      "trips_total": 15,
+      "batches_sent": 3,
+      "heartbeats_sent": 2,
+      "has_travel_city": false
+    },
+    {
+      "car_id": "car-008",
+      "session_id": "be4788d2-ba8f-4c34-aee6-ab3194c1029d",
+      "dominant_city": "Mashhad",
+      "days_requested": 3,
+      "active_days": 3,
+      "total_km_approx": 33,
+      "trips_total": 11,
+      "batches_sent": 3,
+      "heartbeats_sent": 2,
+      "has_travel_city": false
+    },
+    {
+      "car_id": "car-009",
+      "session_id": "f42b15cd-a860-48a6-aa98-12330e08f2a0",
+      "dominant_city": "Isfahan",
+      "days_requested": 3,
+      "active_days": 3,
+      "total_km_approx": 63,
+      "trips_total": 13,
+      "batches_sent": 3,
+      "heartbeats_sent": 3,
+      "has_travel_city": false
+    },
+    {
+      "car_id": "car-010",
+      "session_id": "d31011a9-8783-4c04-b3c4-a66bf2a5d560",
+      "dominant_city": "Kerman",
+      "days_requested": 3,
+      "active_days": 3,
+      "total_km_approx": 61,
+      "trips_total": 9,
+      "batches_sent": 3,
+      "heartbeats_sent": 1,
+      "has_travel_city": false
+    }
+  ]
+}

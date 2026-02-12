@@ -97,8 +97,62 @@ services:
       - es
       - postgres
 
+  # Airflow: orchestration (DAGs for generator + Spark batch)
+  airflow-db:
+    image: docker.resaa.net/postgres:16
+    container_name: airflow-db
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - airflow-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # One-off: fix log/dags volume permissions so Airflow (non-root) can write. Runs as root then exits.
+  airflow-fix-perms:
+    image: busybox:latest
+    container_name: airflow-fix-perms
+    user: "0"
+    environment:
+      AIRFLOW_UID: ${AIRFLOW_UID:-50000}
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+    command: ["sh", "-c", "mkdir -p /opt/airflow/logs/scheduler /opt/airflow/logs/dag_processor && chown -R $${AIRFLOW_UID}:0 /opt/airflow/logs /opt/airflow/dags"]
+    restart: "no"
+
+  airflow:
+    image: docker.resaa.net/apache/airflow:2.8.3
+    container_name: airflow
+    environment:
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-db/airflow
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "false"
+      AIRFLOW_UID: ${AIRFLOW_UID:-50000}
+      _PIP_ADDITIONAL_REQUIREMENTS: docker
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "8081:8080"
+    command: ["airflow", "standalone"]
+    depends_on:
+      airflow-db:
+        condition: service_healthy
+      airflow-fix-perms:
+        condition: service_completed_successfully
+      spark:
+        condition: service_started
+
 volumes:
   postgres-db-volume:
+  airflow-db-data:
   esdata:
     driver: local
   kibanadata:
